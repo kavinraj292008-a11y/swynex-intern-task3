@@ -1,6 +1,6 @@
 const Task = require("../models/task.model");
 
-const createTask = async (req, res) => {
+const createTask = async (req, res, next) => {
     try {
         const task = await Task.create(req.body);
 
@@ -11,14 +11,11 @@ const createTask = async (req, res) => {
         });
 
     } catch (error) {
-        res.status(400).json({
-            success: false,
-            message: error.message
-        });
+        next(error);
     }
 };
 
-const getTasks = async (req, res) => {
+const getTasks = async (req, res, next) => {
     try {
         const tasks = await Task.find();
 
@@ -29,23 +26,20 @@ const getTasks = async (req, res) => {
         });
 
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
+        next(error);
     }
 };
 
-const getTaskById = async (req, res) => {
+const getTaskById = async (req, res, next) => {
     try {
         const task = await Task.findById(req.params.id);
 
         if (!task) {
-            return res.status(404).json({
-                success: false,
-                message: "Task not found"
-            });
-        }
+    const error = new Error("Task not found");
+    error.statusCode = 404;
+    error.code = "NOT_FOUND";
+    return next(error);
+}
 
         res.status(200).json({
             success: true,
@@ -53,14 +47,11 @@ const getTaskById = async (req, res) => {
         });
 
     } catch (error) {
-        res.status(400).json({
-            success: false,
-            message: "Invalid task ID"
-        });
+        next(error);
     }
 };
 
-const updateTask = async (req, res) => {
+const updateTask = async (req, res, next) => {
     try {
         const task = await Task.findByIdAndUpdate(
             req.params.id,
@@ -72,11 +63,11 @@ const updateTask = async (req, res) => {
         );
 
         if (!task) {
-            return res.status(404).json({
-                success: false,
-                message: "Task not found"
-            });
-        }
+    const error = new Error("Task not found");
+    error.statusCode = 404;
+    error.code = "NOT_FOUND";
+    return next(error);
+}
 
         res.status(200).json({
             success: true,
@@ -85,23 +76,20 @@ const updateTask = async (req, res) => {
         });
 
     } catch (error) {
-        res.status(400).json({
-            success: false,
-            message: error.message
-        });
+        next(error);
     }
 };
 
-const deleteTask = async (req, res) => {
+const deleteTask = async (req, res, next) => {
     try {
         const task = await Task.findByIdAndDelete(req.params.id);
 
         if (!task) {
-            return res.status(404).json({
-                success: false,
-                message: "Task not found"
-            });
-        }
+    const error = new Error("Task not found");
+    error.statusCode = 404;
+    error.code = "NOT_FOUND";
+    return next(error);
+}
 
         res.status(200).json({
             success: true,
@@ -109,10 +97,7 @@ const deleteTask = async (req, res) => {
         });
 
     } catch (error) {
-        res.status(400).json({
-            success: false,
-            message: "Invalid task ID"
-        });
+        next(error);
     }
 };
 
